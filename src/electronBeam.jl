@@ -62,3 +62,39 @@ function Wave(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real})::
     # return the wanted struct
     return Wave2d(ψ, int_flat, x, y)
 end
+
+"""
+    getintensity(wave::Wave)::Vector{<:Real}
+
+Return the intensity.
+
+Calculate the current intensity and return it. The `wave` value is the wave struct
+from which the intensity should be returned.
+"""
+function getintensity(wave::Wave1d)::Vector{<:Real}
+    intensity = zeros(Float64, size(wave.intensity))
+    dx = abs(wave.x[1]-wave.x[2])
+
+    # loop over the incident points
+    for i = 1:size(wave.ψ, 1)
+
+        # loop over the endpoints
+        for j = 1:size(wave.ψ, 1)
+
+            # check if the
+            if abs(wave.ψ[i][1]-wave.x[j]) <= dx/2
+
+                # add the intensity from the incident plane
+                # to the output plane
+                intensity[j] += wave.intensity[i]
+
+                # if a incident point is assigned to a output intensity
+                # break the loop (for the sake of rounding and energy consercation)
+                break
+            else end
+        end
+    end
+
+    # return the intensity at the different points
+    return intensity
+end
