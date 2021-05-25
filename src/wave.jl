@@ -1,7 +1,7 @@
 
 abstract type AbstractWave end
 
-mutable struct Wave1d
+mutable struct Wave1d <: AbstractWave
     ψ::Vector{Array}
     intensity::Vector{<:Real}
     x::Vector{<:Real}
@@ -27,7 +27,7 @@ function Wave(x::Vector{<:Real}, intensity::Vector{<:Real})::Wave1d
     return Wave(ψ, intensity, x)
 end
 
-mutable struct Wave2d
+mutable struct Wave2d <: AbstractWave
     ψ::Vector{Array}
     intensity::Vector{<:Real}
     x::Vector{<:Real}
@@ -72,29 +72,89 @@ Calculate the current intensity and return it. The `wave` value is the wave stru
 from which the intensity should be returned.
 """
 function getintensity(wave::Wave1d)::Vector{<:Real}
+    
+    # intensity is returned in the same coordinate system as 
+    # the wave object has at the starting point!
+    x = wave.x
     intensity = zeros(Float64, size(wave.intensity))
-    dx = abs(wave.x[1]-wave.x[2])
+    dx = abs(x[1]-x[2])
 
-    # loop over the incident points
+    # loop over the rays
     for i = 1:size(wave.ψ, 1)
 
-        # loop over the endpoints
-        for j = 1:size(wave.ψ, 1)
+        # loop over the coordinate system
+        for j = 1:size(x, 1)
 
-            # check if the
-            if abs(wave.ψ[i][1]-wave.x[j]) <= dx/2
+            # check if the ray is near the current coorinate
+            if abs(wave.ψ[i][1]-x[j]) <= dx/2
 
                 # add the intensity from the incident plane
                 # to the output plane
                 intensity[j] += wave.intensity[i]
 
                 # if a incident point is assigned to a output intensity
-                # break the loop (for the sake of rounding and energy consercation)
+                # break the loop (for the sake of rounding and energy conservation)
                 break
             else end
         end
     end
 
     # return the intensity at the different points
+    return intensity
+end
+
+"""
+    getintensity(wave::Wave2d)::Matrix{<:Real}
+
+Return the intensity.
+
+Calculate the corrent intensity and return it. The `wave` value is the wave struct
+from which the intensity should be returned.
+"""
+function getintensity(wave::Wave2d)::Matrix{<:Real}
+    x = wave.x
+    y = wave.y
+    intensity = zeros(Float64, size(x, 1), size(y, 1))
+    dx = abs(x[1]-x[2])
+    dy = abs(y[1]-y[2])
+
+    # create a breakit variable: break the second loop if breakit is true
+    breakit = false
+ 
+    # loop over the rays
+    for i = 1:size(wave.ψ, 1)
+
+        # loop over the y axis
+        for k = 1:size(y, 1)
+
+            # loop over the x axis
+            for j = 1:size(x, 1)
+
+                # check if the ray is near the current coordinate position
+                if abs(wave.ψ[i][1]-x[j]) <= dx/2 && abs(wave.ψ[i][2]-y[k]) <= dy/2
+
+                    # add the rays to the intensity
+                    intensity[j, k] = wave.intensity[i]
+
+                    # break the loops if a ray is assigned to a new destination
+                    breakit = true
+                    break
+                else end
+            end
+
+            # if the ray is assigned, i.e. breakit is true,
+            # then break the second loop
+            if breakit
+
+                # reset the breakit variable
+                breakit = false
+
+                # break the second loop
+                break
+            else end
+        end
+    end
+
+    # return the intensity
     return intensity
 end

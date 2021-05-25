@@ -1,9 +1,9 @@
 module Raytracing
 
 export Free, Lense, Setup, propagation!
-export Wave
+export Wave, getintensity
 
-include("electronBeam.jl")
+include("wave.jl")
 include("components.jl")
 
 end # module

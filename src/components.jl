@@ -18,7 +18,7 @@ the different components that are used in the setup.
 Setup(comps::Component...) = Setup(collect(comps))
 
 
-function propagation!(wave::Wave, setup::Setup)
+function propagation!(wave::AbstractWave, setup::Setup)
     
     # create the setup matrix that contains all the 
     setup_mat = setup.setup[end].mat
