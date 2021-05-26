@@ -1,4 +1,4 @@
 name = "Raytracing"
 uuid = "827a856a-6b11-46df-be34-5234e1eb8d56"
 authors = ["Matthias Schneller <matthias.schneller@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
