@@ -29,20 +29,20 @@ function pondinteraction!(lf::LightField1d, ray::Electron1d)
     for i = 1:size(ray.ψ, 1)
         
         # calculate the Force at the position of the electron
-        Fx = constant * _interpolation(int_grad, lf.x, ray[i].ψ[1])
+        Fx = constant * _interpolation(int_grad, lf.x, ray.ψ[i][1])
 
         # calculate Δpx
         Δpx = Fx * Δt * t_int
 
         # calculate the tangens alpha value
-        tan_α = tan(ray[i].ψ[2])
+        tan_α = tan(ray.ψ[i][2])
         γ = sqrt(1 + tan_α^2)
 
         # update the angle α
-        ray[i].ψ[2] = atan(tan_α + Δpx * γ / ray[i].p_ges)
+        ray.ψ[i][2] = atan(tan_α + Δpx * γ / ray.p_ges[i])
 
         # update the new momentum for this ray
-        ray[i].p_ges = sqrt( (tan_α * ray[i].p_ges / γ)^2 + (ray[i].p_ges / γ)^2 )
+        ray.p_ges[i] = sqrt( (tan_α * ray.p_ges[i] / γ)^2 + (ray.p_ges[i] / γ)^2 )
     end
 end
 
@@ -74,27 +74,28 @@ function pondinteraction!(lf::LightField2d, ray::Electron2d)
 
     # iterate over the all the electron beams
     for i = 1:size(ray.ψ, 1)
+
         # interpolate the x and y force-direction
-        Fx = constant * _interpolation(int_grad_x, lf.x, lf.y, ray[i].ψ[1], ray[i].ψ[2])
-        Fy = constant * _interpolation(int_grad_y, lf.x, lf.y, ray[i].ψ[1], ray[i].ψ[2])
+        Fx = constant * _interpolation(int_grad_x, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2])
+        Fy = constant * _interpolation(int_grad_y, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2])
 
         # calculate Δpx and Δpy
         Δpx = Fx * Δt * t_int
         Δpy = Fy * Δt * t_int
 
         # calculate the tangens and a constant
-        tan_α = tan(ray[i].ψ[3])
-        tan_β = tan(ray[i].ψ[4])
+        tan_α = tan(ray.ψ[i][3])
+        tan_β = tan(ray.ψ[i][4])
         γ = sqrt(1 + tan_α^2 + tan_β^2)
         
         # calculate the new angle
-        ray[i].ψ[3] = atan(tan_α + Δpx * γ / ray[i].p_ges)
-        ray[i].ψ[4] = atan(tan_β + Δpy * γ / ray[i].p_ges)
+        ray.ψ[i][3] = atan(tan_α + Δpx * γ / ray.p_ges[i])
+        ray.ψ[i][4] = atan(tan_β + Δpy * γ / ray.p_ges[i])
 
         # calculate the new momentum
-        ray[i].p_ges = sqrt( (tan_α * ray[i].p_ges / γ + Δpx)^2 + 
-                             (tan_β * ray[i].p_ges / γ + Δpy)^2 +
-                             (ray[i].p_ges / γ)^2 )
+        ray.p_ges[i] = sqrt( (tan_α * ray.p_ges[i] / γ + Δpx)^2 + 
+                             (tan_β * ray.p_ges[i] / γ + Δpy)^2 +
+                             (ray.p_ges[i] / γ)^2 )
     end
 end
 
@@ -190,7 +191,7 @@ function _interpolation(A::Vector{<:Real}, coords::Vector{<:Real}, x::Real)::Rea
     Δx = abs(coords[1]-coords[2])
 
     # calculate the bin after which the x value lies
-    n = round(Int, x / Δx, RoundDown) + 1
+    n = round(Int, (x-coods[1]) / Δx, RoundDown) + 1
 
     # define the k value of the linear function
     k = (A[n] - A[n+1]) / (coords[n] - coords[n+1])
@@ -227,8 +228,8 @@ function _interpolation(A::Matrix{<:Real}, coords_x::Vector{<:Real},
     Δy = abs(coords_y[1]-coords_y[2])
 
     # calculate the bins in which the x and y values are
-    n = round(Int, x / Δx, RoundDown) + 1
-    m = round(Int, y / Δy, RoundDown) + 1
+    n = round(Int, (x-coords_x[1]) / Δx, RoundDown) + 1
+    m = round(Int, (y-coords_x[1]) / Δy, RoundDown) + 1
 
     # interpolation in x direction on both y-points
     k1 = (A[n, m] - A[n+1, m]) / (coords_x[n] - coords_y[n+1])

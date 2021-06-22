@@ -117,55 +117,31 @@ function getintensity(wave::Electron1d)::Vector{<:Real}
 end
 
 """
-    getintensity(wave::Electron2d)::Matrix{<:Real}
+    getintensity(ray::Electron2d), x::Vector{<:Real}, y::Vector{<:Real}::Matrix{<:Real}
 
 Return the intensity.
 
-Calculate the corrent intensity and return it. The `wave` value is the wave struct
-from which the intensity should be returned.
+Calculate the corrent intensity and return it. The `ray` value is the electron beam struct
+from which the intensity should be returned, the `x` and `y` values are the coordinates
+in which the intensity should be returned.
 """
-function getintensity(wave::Electron2d)::Matrix{<:Real}
-    x = wave.x
-    y = wave.y
+function getintensity(ray::Electron2d, x::Vector{<:Real}, y::Vector{<:Real})::Matrix{<:Real}
+    
+    # create the empty intensity array
     intensity = zeros(Float64, size(x, 1), size(y, 1))
-    dx = abs(x[1]-x[2])
-    dy = abs(y[1]-y[2])
-
-    # create a breakit variable: break the second loop if breakit is true
-    breakit = false
+    Δx = abs(x[1]-x[2])
+    Δy = abs(y[1]-y[2])
  
     # loop over the rays
-    for i = 1:size(wave.ψ, 1)
+    for i = 1:size(ray.ψ, 1)
 
-        # loop over the y axis
-        for k = 1:size(y, 1)
+        # calculate the position of the intensity in the new grid
+        # the minus the first element "normalizes" the grid
+        n = round(Int, (ray.ψ[i][1]-x[1]) / Δx, RoundDown) + 1
+        m = round(Int, (ray.ψ[i][2]-y[1]) / Δy, RoundDown) + 1
 
-            # loop over the x axis
-            for j = 1:size(x, 1)
-
-                # check if the ray is near the current coordinate position
-                if abs(wave.ψ[i][1]-x[j]) <= dx/2 && abs(wave.ψ[i][2]-y[k]) <= dy/2
-
-                    # add the rays to the intensity
-                    intensity[j, k] = wave.intensity[i]
-
-                    # break the loops if a ray is assigned to a new destination
-                    breakit = true
-                    break
-                else end
-            end
-
-            # if the ray is assigned, i.e. breakit is true,
-            # then break the second loop
-            if breakit
-
-                # reset the breakit variable
-                breakit = false
-
-                # break the second loop
-                break
-            else end
-        end
+        # add the intensity to the grid point
+        intensity[n, m] += ray.intensity[i]
     end
 
     # return the intensity
