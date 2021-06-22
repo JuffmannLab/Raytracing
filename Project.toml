@@ -2,3 +2,6 @@ name = "Raytracing"
 uuid = "827a856a-6b11-46df-be34-5234e1eb8d56"
 authors = ["Matthias Schneller <matthias.schneller@gmail.com>"]
 version = "0.1.1"
+
+[deps]
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"

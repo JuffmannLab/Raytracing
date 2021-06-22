@@ -26,7 +26,7 @@ This function calculates the matrix that describes the setup `setup` in a
 raytracing way. This matrix is then applied to all the rays contained
 in `wave`. This function is responsible for the 1D propagation.
 """
-function propagation!(wave::Wave1d, setup::Setup)
+function propagation!(wave::Electron1d, setup::Setup)
     
     # create the setup matrix, multiplication with all the
     # setup elements.
@@ -53,7 +53,7 @@ This function calculates the matrix that describes the setup `setup` in a
 raytracing way. This matrix is then applied to all the rays contained
 in `wave`. This function is responsible for the 2D propagation.
 """
-function propagation!(wave::Wave2d, setup::Setup)
+function propagation!(wave::Electron2d, setup::Setup)
     
     setup_mat = setup.setup[end].mat2D
 

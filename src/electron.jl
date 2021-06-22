@@ -1,77 +1,85 @@
 
-abstract type AbstractWave end
+abstract type AbstractElectron end
 
-mutable struct Wave1d <: AbstractWave
+mutable struct Electron1d <: AbstractElectron
     ψ::Vector{Array}
     intensity::Vector{<:Real}
+    p_ges::Vector{<:Real}
     x::Vector{<:Real}
 end
 
 """
-    Wave(x::Vector{<:Real}, intensity::Vector{<:Real})::Wave1d
+    Electron(x::Vector{<:Real}, intensity::Vector{<:Real})::Electron1d
 
-Return a Wave1d type.
+Return a Electron1d type.
 
 Create and return the 1D wave function. The `x` value corresponds to the
 x-axis, and `intensity` corresponds to the intensity distribution along
 the given axis.
 """
-function Wave(x::Vector{<:Real}, intensity::Vector{<:Real})::Wave1d
+function Electron(x::Vector{<:Real}, intensity::Vector{<:Real}, momentum::Real)::Electron1d
    
     # create the new position angle vectors
     ψ = Vector{Array}(undef, size(x, 1))
+    p_ges = similar(intensity)
     for i = 1:size(ψ, 1)
         ψ[i] = [x[i] 0]
+        p_ges[i] = momentum
     end
 
-    return Wave(ψ, intensity, x)
+    return Electron1d(ψ, intensity, p_ges, x)
 end
 
-mutable struct Wave2d <: AbstractWave
+mutable struct Electron2d <: AbstractElectron
     ψ::Vector{Array}
     intensity::Vector{<:Real}
+    p_ges::Vector{<:Real}
     x::Vector{<:Real}
     y::Vector{<:Real}
 end
 
 """
-    Wave(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real})::Wave2d
+    Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real},
+             momentum::Real)::Electron2d
 
-Return the Wave2d type.
+Return the Electron2d type.
 
 Construct and return a 2D wave. The `x` and `y` vector correspond to the
 x and y axis of the problem, and the `intensity` is the intensity corresponding
 to the x and y axis given prior.
 """
-function Wave(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real})::Wave2d
+function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real},
+                  momentum::Real)::Electron2d
     
     # create the array with the different angles and positions
     ψ = Vector{Array}(undef, size(x, 1) * size(y, 1))
 
     # create a flattened intensity array
     int_flat = similar(intensity, size(intensity, 1) * size(intensity, 2))
+    p_ges = similar(int_flat)
 
     # fill the ψ array
     for i = 1:size(x, 1)
         for j = 1:size(y, 1)
             ψ[i+(j-1)*size(y, 1)] = [x[i] y[j] 0 0]
             int_flat[i+(j-1)*size(y, 1)] = intensity[i, j]
+            p_ges[i+(j-1)*size(y, 1)] = momentum
         end
     end
 
     # return the wanted struct
-    return Wave2d(ψ, int_flat, x, y)
+    return Electron2d(ψ, int_flat, p_ges, x, y)
 end
 
 """
-    getintensity(wave::Wave)::Vector{<:Real}
+    getintensity(wave::Electron)::Vector{<:Real}
 
 Return the intensity.
 
 Calculate the current intensity and return it. The `wave` value is the wave struct
 from which the intensity should be returned.
 """
-function getintensity(wave::Wave1d)::Vector{<:Real}
+function getintensity(wave::Electron1d)::Vector{<:Real}
     
     # intensity is returned in the same coordinate system as 
     # the wave object has at the starting point!
@@ -104,14 +112,14 @@ function getintensity(wave::Wave1d)::Vector{<:Real}
 end
 
 """
-    getintensity(wave::Wave2d)::Matrix{<:Real}
+    getintensity(wave::Electron2d)::Matrix{<:Real}
 
 Return the intensity.
 
 Calculate the corrent intensity and return it. The `wave` value is the wave struct
 from which the intensity should be returned.
 """
-function getintensity(wave::Wave2d)::Matrix{<:Real}
+function getintensity(wave::Electron2d)::Matrix{<:Real}
     x = wave.x
     y = wave.y
     intensity = zeros(Float64, size(x, 1), size(y, 1))
