@@ -85,7 +85,7 @@ function pondinteraction!(lf::LightField2d, ray::Electron2d)
         # calculate the tangens and a constant
         tan_α = tan(ray[i].ψ[3])
         tan_β = tan(ray[i].ψ[4])
-        γ = sqrt(1 + tan_α^2 tan_β^2)
+        γ = sqrt(1 + tan_α^2 + tan_β^2)
         
         # calculate the new angle
         ray[i].ψ[3] = atan(tan_α + Δpx * γ / ray[i].p_ges)
