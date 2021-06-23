@@ -23,9 +23,6 @@ struct LightField2d <: AbstractLight
     λ::Real
 end
 
-# include some code that will do the calculation
-include("pondInteraction.jl")
-
 """
     LightField(intensity::Vector{<:Real}, envelope::Vector{<:Real}, x::Vector{<:Real},
                t::Vector{<:Real}, λ::Real)::LightField1D

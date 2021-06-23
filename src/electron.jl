@@ -24,7 +24,7 @@ function Electron(x::Vector{<:Real}, intensity::Vector{<:Real}, energy::Real)::E
     p_ges = similar(intensity)
     for i = 1:size(ψ, 1)
         ψ[i] = [x[i] 0]
-        # TODO: impuls us da energie usrechna
+        momentum = sqrt( 2 * energy * q / m_e ) * m_e
         p_ges[i] = momentum
     end
 
