@@ -30,7 +30,7 @@ that are carried out by the setup denoted by `setup`.
 function propagation!(rays::AbstractElectron, setup::Setup)
     
     # iterate over all the components, apply the calculate function
-    for component in setup
+    for component in setup.setup
         calculate!(rays, component)
     end
 end

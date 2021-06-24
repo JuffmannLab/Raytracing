@@ -1,10 +1,9 @@
 module Raytracing
 
 # export the different functions and structs that can be used
-export Free, Lense, Setup, propagation!
+export Free, Lense, PondInteraction, Setup, propagation!
 export Electron, getintensity
 export loadintensity, LightField
-export pondinteraction!
 
 # define some nature constants
 global const m_e = 9.1093837015e-31  # the electron mass

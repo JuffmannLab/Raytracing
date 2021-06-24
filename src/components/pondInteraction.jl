@@ -1,15 +1,22 @@
 
-"""
-    pondinteraction!(lf::LightField1d, ray::Electron1d)
+struct PondInteraction <: Component
+    lf::AbstractLight
+end
 
-Return the scattering angle.
+"""
+    calculate!(ray::Electron1d, pond::PondInteraction)
+
+Apply the ponderomotive interaction on the electrons.
 
 Calculate the new propagation direction of all the electron rays, when it interacts
-with a given light field that is defined in `LightField1d`. The electron are contained
-in the `ray` parameter.
+with a given light field that is saved in the PondInteraction object `pond`. 
+The electron are contained in the `ray` parameter.
 """
-function pondinteraction!(lf::LightField1d, ray::Electron1d)
+function calculate!(ray::Electron1d, pond::PondInteraction)
     
+    # get the light field object out of the PondInteraction object
+    lf = pond.lf
+
     # calculate the intensity gradient
     int_grad = _gradient(lf.intensity, lf.x)
 
@@ -20,7 +27,7 @@ function pondinteraction!(lf::LightField1d, ray::Electron1d)
     Δt = abs(lf.t[1]-lf.t[2])
 
     # calculate the time integral
-    t_int = sum(lf.envelope)
+    t_int = sum(lf.envelope) * Δt
     
     # calculate the constant that is needed for units sake
     constant = - q^2 / (4 * m_e * ω^2)
@@ -32,7 +39,7 @@ function pondinteraction!(lf::LightField1d, ray::Electron1d)
         Fx = constant * _interpolation(int_grad, lf.x, ray.ψ[i][1])
 
         # calculate Δpx
-        Δpx = Fx * Δt * t_int
+        Δpx = Fx * t_int
 
         # calculate the tangens alpha value
         tan_α = tan(ray.ψ[i][2])
@@ -47,16 +54,19 @@ function pondinteraction!(lf::LightField1d, ray::Electron1d)
 end
 
 """
-    pondinteraction!(lf::LightField2d, ray::Electron2d)
+    calculation!(pond::PondInteraction, ray::Electron2d)
 
 Calculate the scattering angle.
 
 Calculate the angle that the electron has after the interaction with the light field
-and save it in the ray object. The input parameters are `lf` which is a light field
+and save it in the ray object. The input parameters are `pond` which is a light field
 object, aswell as `ray` which is the electron beams object.
 """
-function pondinteraction!(lf::LightField2d, ray::Electron2d)
+function calculate!(ray::Electron2d, pond::PondInteraction)
     
+    # get the light field out of the PondInteraction struct
+    lf = pond.lf
+
     # calculate the intensity gradients
     (int_grad_x, int_grad_y) = _gradient(lf.intensity, lf.x, lf.y)
 
@@ -67,7 +77,7 @@ function pondinteraction!(lf::LightField2d, ray::Electron2d)
     Δt = abs(lf.t[1]-lf.t[2])
 
     # calculate the time integral
-    t_int = sum(lf.envelope)
+    t_int = sum(lf.envelope) * Δt
 
     # calculate the constant that is needed for units sake
     constant = - q^2 / (4 * m_e * ω^2)
@@ -80,8 +90,8 @@ function pondinteraction!(lf::LightField2d, ray::Electron2d)
         Fy = constant * _interpolation(int_grad_y, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2])
 
         # calculate Δpx and Δpy
-        Δpx = Fx * Δt * t_int
-        Δpy = Fy * Δt * t_int
+        Δpx = Fx * t_int
+        Δpy = Fy * t_int
 
         # calculate the tangens and a constant
         tan_α = tan(ray.ψ[i][3])
@@ -247,4 +257,4 @@ function _interpolation(A::Matrix{<:Real}, coords_x::Vector{<:Real},
 
     # return the interpolated value
     return k * y + d
-end
+end 

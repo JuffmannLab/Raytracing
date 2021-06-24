@@ -23,7 +23,7 @@ function Electron(x::Vector{<:Real}, intensity::Vector{<:Real}, energy::Real)::E
     ψ = Vector{Array}(undef, size(x, 1))
     p_ges = similar(intensity)
     for i = 1:size(ψ, 1)
-        ψ[i] = [x[i] 0]
+        ψ[i] = [x[i], 0.]
         momentum = sqrt( 2 * energy * q / m_e ) * m_e
         p_ges[i] = momentum
     end
@@ -66,7 +66,7 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
     # fill the ψ array
     for i = 1:size(x, 1)
         for j = 1:size(y, 1)
-            ψ[i+(j-1)*size(y, 1)] = [x[i] y[j] 0 0]
+            ψ[i+(j-1)*size(y, 1)] = [x[i], y[j], 0., 0.]
             int_flat[i+(j-1)*size(y, 1)] = intensity[i, j]
             p_ges[i+(j-1)*size(y, 1)] = momentum
         end
@@ -141,7 +141,13 @@ function getintensity(ray::Electron2d, x::Vector{<:Real}, y::Vector{<:Real})::Ma
         m = round(Int, (ray.ψ[i][2]-y[1]) / Δy, RoundDown) + 1
 
         # add the intensity to the grid point
-        intensity[n, m] += ray.intensity[i]
+        try
+            intensity[n, m] += ray.intensity[i]
+        catch e
+            # catch a BoundsError, and do nothing, because there is nothing to do
+            if isa(e, BoundsError)
+            end
+        end
     end
 
     # return the intensity
