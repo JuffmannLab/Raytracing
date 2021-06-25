@@ -73,14 +73,19 @@ function calculate!(ray::Electron2d, pond::PondInteraction)
     # calculate the ω parameter
     ω = 2*π*c / lf.λ
 
-    # calculate the Δt
+    # calculate the Δt, Δx and Δy
     Δt = abs(lf.t[1]-lf.t[2])
+    Δx = abs(lf.x[1]-lf.y[2])
+    Δy = abs(lf.y[1]-lf.y[2])
 
     # calculate the time integral
     t_int = sum(lf.envelope) * Δt
 
+    # normalization factor for the intensity
+    I0 = lf.E / ( sum(lf.intensity) * Δx * Δy * t_int )
+
     # calculate the constant that is needed for units sake
-    constant = - q^2 / (4 * m_e * ω^2)
+    constant = - q^2 * I0 / (2 * m_e * ω^2 * c * ε_0)
 
     # iterate over the all the electron beams
     for i = 1:size(ray.ψ, 1)
