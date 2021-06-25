@@ -17,7 +17,7 @@ Create and return the 1D wave function. The `x` value corresponds to the
 x-axis, and `intensity` corresponds to the intensity distribution along
 the given axis. `n` correspond to the number of rays that should be simulated.
 """
-function Electron(x::Vector{<:Real}, intensity::Vector{<:Real}, energy::Real, n::Int64)::Electron1d
+function Electron(x::Vector{<:Real}, intensity::Vector{<:Real}, energy::Real, n::Int)::Electron1d
    
 
     # TODO:
@@ -55,7 +55,7 @@ energy in eV. The number of rays that should be simulated are cenoted by the `n`
 value.
 """
 function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real},
-                  energy::Real, n::Int64)::Electron2d
+                  energy::Real, n::Int)::Electron2d
     
     # create the array with the different angles and positions
     ψ = Vector{Array}(undef, n)
@@ -77,18 +77,18 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
     for i = 1:n
 
         # generate random coordinates that are evenly distributed in x and y direction
-        coords_rand = rand(Float64, 2)-0.5
+        coords_rand = rand(Float64, 2) .- 0.5
         x_temp = coords_rand[1] * span_x
         y_temp = coords_rand[2] * span_y
 
         # get the position of the random coordinates in the intensity array
-        m_x = round(Int, (x_temp-x[1]) / Δx, RoundDown)+1
-        m_y = round(Int, (y_temp-y[1]) / Δy, RoundDown)+1
+        m_x = round(Int, (x_temp-x[1]) / Δx, RoundDown) + 1
+        m_y = round(Int, (y_temp-y[1]) / Δy, RoundDown) + 1
 
         # fill the ψ, p_ges and flat_int vectors
-        ψ[n] = [x_temp, y_temp, 0. 0.]
-        int_flat[n] = intensity[m_x, m_y]
-        p_ges[n] = momentum
+        ψ[i] = [x_temp, y_temp, 0., 0.]
+        int_flat[i] = intensity[m_x, m_y]
+        p_ges[i] = momentum
 
     end
 
