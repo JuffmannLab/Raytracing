@@ -54,7 +54,7 @@ function calculate!(ray::Electron1d, pond::PondInteraction)
 end
 
 """
-    calculation!(pond::PondInteraction, ray::Electron2d)
+    calculate!(ray::Electron2d, pond::PondInteraction)
 
 Calculate the scattering angle.
 
