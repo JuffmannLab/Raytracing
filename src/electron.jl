@@ -1,4 +1,6 @@
 
+using FFTW
+
 abstract type AbstractElectron end
 
 mutable struct Electron1d <: AbstractElectron
@@ -169,4 +171,27 @@ function getintensity(ray::Electron2d, x::Vector{<:Real}, y::Vector{<:Real})::Ma
 
     # return the intensity
     return intensity
+end
+
+"""
+    mcp(intensity::Matrix{<:Real}, x::Vector{<:Real}, y::Vector{<:Real}, σ::Real)::Matrix{<:Real}
+
+Return the mcp electron distribution.
+
+The light that leaves the mcp is calculated here. It is done by taking the input electron
+istripution of the `intensity` matrix, the geometry of the mcp `x` and `y` and the smearout
+that will happen due to the mcp. The smearout is modelled as a gaussian smear with the width
+of `σ`.
+"""
+function mcp(intensity::Matrix{<:Real}, x::Vector{<:Real}, 
+             y::Vector{<:Real}, σ::Real)::Matrix{<:Real}
+
+    # create the smear function that is applied to the intensity
+    smear = [exp(-(x[i]^2+y[j]^2) / 2 / σ^2) for i in eachindex(x), j in eachindex(y)]
+
+    # convolve the smear function with the intensity
+    INTENSITY = fft(intensity)
+    SMEAR = fft(smear)
+    SMEAR .*= INTENSITY
+    return real.(ifftshift(ifft(SMEAR)))
 end

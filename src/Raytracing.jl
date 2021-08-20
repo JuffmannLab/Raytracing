@@ -2,7 +2,7 @@ module Raytracing
 
 # export the different functions and structs that can be used
 export Free, Lense, PondInteraction, Setup, propagation!
-export Electron, getintensity
+export Electron, getintensity, mcp
 export loadintensity, LightField
 
 # define some nature constants
