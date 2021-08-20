@@ -141,7 +141,7 @@ end
 
 Return the intensity.
 
-Calculate the corrent intensity and return it. The `ray` value is the electron beam struct
+Calculate the current intensity and return it. The `ray` value is the electron beam struct
 from which the intensity should be returned, the `x` and `y` values are the coordinates
 in which the intensity should be returned.
 """
@@ -151,9 +151,9 @@ function getintensity(ray::Electron2d, x::Vector{<:Real}, y::Vector{<:Real})::Ma
     intensity = zeros(Float64, size(x, 1), size(y, 1))
     Δx = abs(x[1]-x[2])
     Δy = abs(y[1]-y[2])
- 
+
     # loop over the rays
-    for i = 1:size(ray.ψ, 1)
+    for i in eachindex(ray.ψ)
 
         # calculate the position of the intensity in the new grid
         # the minus the first element "normalizes" the grid
@@ -161,12 +161,9 @@ function getintensity(ray::Electron2d, x::Vector{<:Real}, y::Vector{<:Real})::Ma
         m = round(Int, (ray.ψ[i][2]-y[1]) / Δy, RoundDown) + 1
 
         # add the intensity to the grid point
-        try
+        if 0 < n < size(intensity, 1) + 1 && 0 < m < size(intensity, 2) + 1
             intensity[n, m] += ray.intensity[i]
-        catch e
-            # catch a BoundsError, and do nothing, because there is nothing to do
-            if isa(e, BoundsError)
-            end
+        else
         end
     end
 
