@@ -2,7 +2,7 @@
 abstract type Component end
 
 include("./components/free.jl")
-include("./components/lense.jl")
+include("./components/lens.jl")
 include("./components/pondInteraction.jl")
 
 struct Setup
