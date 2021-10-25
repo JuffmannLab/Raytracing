@@ -3,58 +3,9 @@ struct PondInteraction <: Component
     lf::AbstractLight
 end
 
-"""
-    calculate!(ray::Electron1d, pond::PondInteraction)
-
-Apply the ponderomotive interaction on the electrons.
-
-Calculate the new propagation direction of all the electron rays, when it interacts
-with a given light field that is saved in the PondInteraction object `pond`. 
-The electron are contained in the `ray` parameter.
-"""
-function calculate!(ray::Electron1d, pond::PondInteraction)
-    
-    # get the light field object out of the PondInteraction object
-    lf = pond.lf
-
-    # calculate the intensity gradient
-    int_grad = _gradient(lf.intensity, lf.x)
-
-    # calculate the ω parameter
-    ω = 2*π*c / lf.λ
-
-    # calculate the Δt
-    Δt = abs(lf.t[1]-lf.t[2])
-
-    # calculate the time integral
-    t_int = sum(lf.envelope) * Δt
-    
-    # calculate the constant that is needed for units sake
-    constant = - q^2 / (4 * m_e * ω^2)
-
-    # iterate over all the electron beams
-    for i = 1:size(ray.ψ, 1)
-        
-        # calculate the Force at the position of the electron
-        Fx = constant * _interpolation(int_grad, lf.x, ray.ψ[i][1])
-
-        # calculate Δpx
-        Δpx = Fx * t_int
-
-        # calculate the tangens alpha value
-        tan_α = tan(ray.ψ[i][2])
-        γ = sqrt(1 + tan_α^2)
-
-        # update the angle α
-        ray.ψ[i][2] = atan(tan_α + Δpx * γ / ray.p_ges[i])
-
-        # update the new momentum for this ray
-        ray.p_ges[i] = sqrt( (tan_α * ray.p_ges[i] / γ)^2 + (ray.p_ges[i] / γ)^2 )
-    end
-end
 
 """
-    calculate!(ray::Electron2d, pond::PondInteraction)
+    calculate!(ray::Electron, pond::PondInteraction)
 
 Calculate the scattering angle.
 
@@ -62,7 +13,7 @@ Calculate the angle that the electron has after the interaction with the light f
 and save it in the ray object. The input parameters are `pond` which is a light field
 object, aswell as `ray` which is the electron beams object.
 """
-function calculate!(ray::Electron2d, pond::PondInteraction)
+function calculate!(ray::Electron, pond::PondInteraction)
     
     # get the light field out of the PondInteraction struct
     lf = pond.lf
@@ -115,34 +66,6 @@ function calculate!(ray::Electron2d, pond::PondInteraction)
 end
 
 """
-    _gradient(V::Vector{<:AbstractFloat}, x::Vector{<:Real})::Vector{<:AbstractFloat}
-
-Calculate the gradient.
-
-The gradient of a Vector `V` is calculated and returned. This method is
-implemented with the dirichlet boundary conditions, that at the outer boundary
-all the values are 0. The `x` value corresponds to the coordinate system we are in.
-"""
-function _gradient(V::Vector{<:AbstractFloat}, x::Vector{<:Real})::Vector{<:AbstractFloat}
-    
-    # define the output gradient field Vector
-    F = similar(V)
-    F[1] = 0
-    F[end] = 0
-
-    # calculate the Δx value
-    Δx = abs(x[1]-x[2])
-
-    # fill the output Vector with the calculation
-    for i = 2:size(V, 1)-1
-        F[i] = (V[i+1]-V[i-1]) / 2 / Δx
-    end
-
-    # return the gradientfield
-    return F
-end
-
-"""
     _gradient(V::Matrix{<:AbstractFloat}, x::Vector{<:Real},
               y::Vector{<:Real})::Tuple{Matrix{<:AbstractFloat},Matrix{<:AbstractFloat}}
 
@@ -185,38 +108,6 @@ function _gradient(V::Matrix{<:AbstractFloat}, x::Vector{<:Real},
     return (Fx, Fy)
 end
 
-"""
-    _interpolation(A::Vector{<:Real}, coords::Vector{<:Real}, x::Real)::Real
-
-Return the linear interpolation.
-
-Here the linear interpolation on a given Vector is calculated and returned.
-The `A` value denotes the vector that will be interpolated, the `coords`
-parameter is the coordinate system of the interpolation data `A`. `x` is
-the point that should be interpolated.
-"""
-function _interpolation(A::Vector{<:Real}, coords::Vector{<:Real}, x::Real)::Real
-
-    # if the x value is not in the area of coords return 0
-    if x < coords[1] || x > coords[end]
-        return zero(eltype(coords))
-    end
-
-    # calculate the Δx value
-    Δx = abs(coords[1]-coords[2])
-
-    # calculate the bin after which the x value lies
-    n = round(Int, (x-coods[1]) / Δx, RoundDown) + 1
-
-    # define the k value of the linear function
-    k = (A[n] - A[n+1]) / (coords[n] - coords[n+1])
-
-    # define the d value of the linear function
-    d = A[n] - k * coords[n]
-
-    # return the linear interpolation
-    return k * x + d
-end
 
 """
     _interpolation(A::Matrix{<:Real}, coords_x::Vector{<:Real},

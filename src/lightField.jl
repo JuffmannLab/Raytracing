@@ -4,16 +4,6 @@ using Images
 
 abstract type AbstractLight end
 
-# create the 1D lightfield strcut (see constructor)
-struct LightField1d <: AbstractLight
-    intensity::Vector{<:Real}
-    envelope::Vector{<:Real}
-    x::Vector{<:Real}
-    t::Vector{<:Real}
-    λ::Real
-    E::Real
-end
-
 # create the 2D lightfield struct (see constructor)
 struct LightField2d <: AbstractLight
     intensity::Matrix{<:Real}
@@ -23,23 +13,6 @@ struct LightField2d <: AbstractLight
     t::Vector{<:Real}
     λ::Real
     E::Real
-end
-
-"""
-    LightField(intensity::Vector{<:Real}, envelope::Vector{<:Real}, x::Vector{<:Real},
-               t::Vector{<:Real}, λ::Real, E::Real)::LightField1D
-
-Return the 1D Light Field struct.
-
-Create and return a Light Field struct (1D). The intensity is denoted with the
-`intensity` parameter, the temporal envelope function with the `envelope`
-parameter, the coordinates for the intensity pattern with the `x` parameter,
-and the coordinates of the temporal envelope with the `t` parameter.
-The `λ` parameter denotes the wavelength and `E` the pulse energy.
-"""
-function LightField(intensity::Vector{<:Real}, envelope::Vector{<:Real}, x::Vector{<:Real},
-                    t::Vector{<:Real}, λ::Real, E::Real)::LightField1d
-    return LightField1d(intensity, envelope, x, t, λ, E)
 end
 
 """
