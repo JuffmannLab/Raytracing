@@ -53,15 +53,16 @@ function calculate!(ray::Electron, pond::PondInteraction)
         tan_α = tan(ray.ψ[i][3])
         tan_β = tan(ray.ψ[i][4])
         γ = sqrt(1 + tan_α^2 + tan_β^2)
+
+        # calculate the momentum components
+        pz = ray.p_ges / γ
+        px = pz * tan_α
+        py = pz * tan_β
         
         # calculate the new angle
-        ray.ψ[i][3] = atan(tan_α + Δpx * γ / ray.p_ges[i])
-        ray.ψ[i][4] = atan(tan_β + Δpy * γ / ray.p_ges[i])
+        ray.ψ[i][3] = atan((px + Δpx) / sqrt(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))
+        ray.ψ[i][4] = atan((py + Δpy) / sqrt(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))
 
-        # calculate the new momentum
-        ray.p_ges[i] = sqrt( (tan_α * ray.p_ges[i] / γ + Δpx)^2 + 
-                             (tan_β * ray.p_ges[i] / γ + Δpy)^2 +
-                             (ray.p_ges[i] / γ)^2 )
     end
 end
 

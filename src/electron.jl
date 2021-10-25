@@ -7,7 +7,7 @@ abstract type AbstractElectron end
 mutable struct Electron <: AbstractElectron
     ψ::Vector{Array}
     intensity::Vector{<:Real}
-    p_ges::Vector{<:Real}
+    p_ges::Real
     x::Vector{<:Real}
     y::Vector{<:Real}
 end
@@ -32,7 +32,6 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
 
     # create a flattened intensity array
     int_flat = similar(intensity, n)
-    p_ges = similar(int_flat)
 
     # calculate the momentum
     momentum = sqrt( 2 * energy * q / m_e ) * m_e
@@ -58,12 +57,11 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
         # fill the ψ, p_ges and flat_int vectors
         ψ[i] = [x_temp, y_temp, 0., 0.]
         int_flat[i] = intensity[m_x, m_y]
-        p_ges[i] = momentum
 
     end
 
     # return the wanted struct
-    return Electron(ψ, int_flat, p_ges, x, y)
+    return Electron(ψ, int_flat, momentum, x, y)
 end
 
 """
