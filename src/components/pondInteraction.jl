@@ -60,8 +60,12 @@ function calculate!(ray::Electron, pond::PondInteraction)
         py = pz * tan_β
         
         # calculate the new angle
-        ray.ψ[i][3] = atan((px + Δpx) / sqrt(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))
-        ray.ψ[i][4] = atan((py + Δpy) / sqrt(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))
+        # the complex - real transformation is to prevent floating point errors
+        # due to floating point differences not being 0 when they should be
+        ray.ψ[i][3] = atan((px + Δpx) / 
+                           real(sqrt(complex(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))))
+        ray.ψ[i][4] = atan((py + Δpy) / 
+                           real(sqrt(complex(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))))
 
     end
 end
