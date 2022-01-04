@@ -7,25 +7,25 @@ abstract type AbstractElectron end
 mutable struct Electron <: AbstractElectron
     ψ::Vector{Array}
     intensity::Vector{<:Real}
-    p_ges::Real
+    v::Real
     x::Vector{<:Real}
     y::Vector{<:Real}
 end
 
 """
     Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real},
-             energy::Real, n::Int64)::Electron2d
+             U::Real, n::Int64)::Electron2d
 
 Return the Electron2d type.
 
 Construct and return a 2D wave. The `x` and `y` vector correspond to the
 x and y axis of the problem, and the `intensity` is the intensity corresponding
-to the x and y axis given prior. The `energy` parameter denotes the electron
-energy in eV. The number of rays that should be simulated are cenoted by the `n`
+to the x and y axis given prior. The `U` parameter denotes the electron
+energy in eV. The number of rays that should be simulated are denoted by the `n`
 value.
 """
 function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real},
-                  energy::Real, n::Int)::Electron
+                  U::Real, n::Int)::Electron
     
     # create the array with the different angles and positions
     ψ = Vector{Array}(undef, n)
@@ -33,8 +33,8 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
     # create a flattened intensity array
     int_flat = similar(intensity, n)
 
-    # calculate the momentum
-    momentum = sqrt( 2 * energy * q / m_e ) * m_e
+    # calculate the relativistic electron velocity
+    v = c * sqrt(1 - 1 / (1 + U * q / m_e / c^2)^2)
 
     # calculate the span of x and y, aswell as Δx and Δy
     span_x = abs(x[1]-x[end])
@@ -60,8 +60,8 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
 
     end
 
-    # return the wanted struct
-    return Electron(ψ, int_flat, momentum, x, y)
+    # the wanted struct
+    return Electron(ψ, int_flat, v, x, y)
 end
 
 """

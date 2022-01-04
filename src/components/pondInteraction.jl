@@ -35,8 +35,19 @@ function calculate!(ray::Electron, pond::PondInteraction)
     # normalization factor for the intensity
     I0 = lf.E / ( sum(lf.intensity) * Δx * Δy * t_int )
 
+    # define α * ħ
+    αħ = 1 / (4 * π * ε_0) * q^2 / c
+
+    # define the beta (should it be v_z? i assume that it is not relevant, bc v ≈ v_z)
+    β = ray.v / c
+
+    # define the electron Energy and momentum
+    γ = 1 / sqrt(1 - (ray.v / c)^2)
+    Ee = γ * m_e * c^2
+    p = γ * m_e * v
+
     # calculate the constant that is needed for units sake
-    constant = - q^2 * I0 / (2 * m_e * ω^2 * c * ε_0)
+    constant = αħ * lf.λ^2 / (2 * π * (1 - β)) * I0 / Ee
 
     # iterate over the all the electron beams
     for i = 1:size(ray.ψ, 1)
@@ -52,10 +63,10 @@ function calculate!(ray::Electron, pond::PondInteraction)
         # calculate the tangens and a constant
         tan_α = tan(ray.ψ[i][3])
         tan_β = tan(ray.ψ[i][4])
-        γ = sqrt(1 + tan_α^2 + tan_β^2)
+        A = sqrt(1 + tan_α^2 + tan_β^2)
 
         # calculate the momentum components
-        pz = ray.p_ges / γ
+        pz = p / A
         px = pz * tan_α
         py = pz * tan_β
         
@@ -63,9 +74,9 @@ function calculate!(ray::Electron, pond::PondInteraction)
         # the complex - real transformation is to prevent floating point errors
         # due to floating point differences not being 0 when they should be
         ray.ψ[i][3] = atan((px + Δpx) / 
-                           real(sqrt(complex(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))))
+                           real(sqrt(complex(pz^2 * A^2 - (px + Δpx)^2 - (py + Δpy)^2))))
         ray.ψ[i][4] = atan((py + Δpy) / 
-                           real(sqrt(complex(pz^2 * γ^2 - (px + Δpx)^2 - (py + Δpy)^2))))
+                           real(sqrt(complex(pz^2 * A^2 - (px + Δpx)^2 - (py + Δpy)^2))))
 
     end
 end
