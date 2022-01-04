@@ -14,7 +14,7 @@ and save it in the ray object. The input parameters are `pond` which is a light 
 object, aswell as `ray` which is the electron beams object.
 """
 function calculate!(ray::Electron, pond::PondInteraction)
-    
+ 
     # get the light field out of the PondInteraction struct
     lf = pond.lf
 
@@ -44,7 +44,7 @@ function calculate!(ray::Electron, pond::PondInteraction)
     # define the electron Energy and momentum
     γ = 1 / sqrt(1 - (ray.v / c)^2)
     Ee = γ * m_e * c^2
-    p = γ * m_e * v
+    p = γ * m_e * ray.v
 
     # calculate the constant that is needed for units sake
     constant = αħ * lf.λ^2 / (2 * π * (1 - β)) * I0 / Ee
