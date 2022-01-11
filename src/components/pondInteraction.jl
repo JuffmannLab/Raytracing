@@ -35,21 +35,12 @@ function calculate!(ray::Electron, pond::PondInteraction)
     # normalization factor for the intensity
     I0 = lf.E / ( sum(lf.intensity) * Δx * Δy * t_int )
 
-    # define α * ħ
-    αħ = 1 / (4 * π * ε_0) * q^2 / c
-
-    # define the beta (should it be v_z? i assume that it is not relevant, bc v ≈ v_z)
-    β = ray.v / c
-
     # define the electron Energy and momentum
     γ = 1 / sqrt(1 - (ray.v / c)^2)
-    Ee = γ * m_e * c^2
     p = γ * m_e * ray.v
 
     # calculate the constant that is needed for units sake
-    # the plus before the beta denotes that the electron and the 
-    # photon are counter propagating
-    constant = αħ * lf.λ^2 / (2 * π * (1 + β)) * I0 / Ee
+    constant = q^2 / (ε_0 * c * ω^2 * m_e * γ)
 
     # iterate over the all the electron beams
     for i = 1:size(ray.ψ, 1)
