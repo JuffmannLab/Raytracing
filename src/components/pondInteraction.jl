@@ -47,7 +47,9 @@ function calculate!(ray::Electron, pond::PondInteraction)
     p = γ * m_e * ray.v
 
     # calculate the constant that is needed for units sake
-    constant = αħ * lf.λ^2 / (2 * π * (1 - β)) * I0 / Ee
+    # the plus before the beta denotes that the electron and the 
+    # photon are counter propagating
+    constant = αħ * lf.λ^2 / (2 * π * (1 + β)) * I0 / Ee
 
     # iterate over the all the electron beams
     for i = 1:size(ray.ψ, 1)
