@@ -26,39 +26,32 @@ function calculate!(ray::Electron, pond::PondInteraction)
 
     # calculate the Δt, Δx and Δy
     Δt = abs(lf.t[1]-lf.t[2])
-    Δx = abs(lf.x[1]-lf.y[2])
+    Δx = abs(lf.x[1]-lf.x[2])
     Δy = abs(lf.y[1]-lf.y[2])
 
-    # calculate the time integral
-    t_int = sum(lf.envelope) * Δt
-
     # normalization factor for the intensity
-    I0 = lf.E / ( sum(lf.intensity) * Δx * Δy * t_int )
+    spat_int = sum(lf.intensity) * Δx * Δy
 
     # define the electron Energy and momentum
     γ = 1 / sqrt(1 - (ray.v / c)^2)
     p = γ * m_e * ray.v
 
     # calculate the constant that is needed for units sake
-    constant = q^2 / (ε_0 * c * ω^2 * m_e * γ)
+    k = - q^2 * lf.E / (m_e * γ * ω^2 * ε_0 * c)
 
     # iterate over the all the electron beams
     for i = 1:size(ray.ψ, 1)
 
         # interpolate the x and y force-direction
-        Fx = constant * _interpolation(int_grad_x, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2])
-        Fy = constant * _interpolation(int_grad_y, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2])
-
-        # calculate Δpx and Δpy
-        Δpx = Fx * t_int
-        Δpy = Fy * t_int
+        Δpx = k * _interpolation(int_grad_x, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2]) / spat_int
+        Δpy = k * _interpolation(int_grad_y, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2]) / spat_int
 
         # calculate the tangens and a constant
         tan_α = tan(ray.ψ[i][3])
         tan_β = tan(ray.ψ[i][4])
         A = sqrt(1 + tan_α^2 + tan_β^2)
 
-        # calculate the momentum components
+        # calculate the momentum
         pz = p / A
         px = pz * tan_α
         py = pz * tan_β
