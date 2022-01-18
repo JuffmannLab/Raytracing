@@ -46,6 +46,9 @@ function calculate!(ray::Electron, pond::PondInteraction)
         Δpx = k * _interpolation(int_grad_x, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2]) / spat_int
         Δpy = k * _interpolation(int_grad_y, lf.x, lf.y, ray.ψ[i][1], ray.ψ[i][2]) / spat_int
 
+        display(Δpx)
+        display(Δpy)
+
         # calculate the tangens and a constant
         tan_α = tan(ray.ψ[i][3])
         tan_β = tan(ray.ψ[i][4])
