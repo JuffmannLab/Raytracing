@@ -4,33 +4,26 @@ using Images
 
 abstract type AbstractLight end
 
-# create the 2D lightfield struct (see constructor)
-struct LightField2d <: AbstractLight
+"""
+    LightField(intensity::Matrix{<:Real}, norm::Real, x::Vector{<:Real},
+               y::Vector{<:Real}, λ::Real, E::Real)::LightField
+
+Return a Light Field struct.
+
+Create and return a Light Field struct, where the intensity is given by the
+`intensity` parameter, and the normalization factor (integral over the whole space)
+`norm` of the intensity, the coordinates in the `x` and `y` direction The `λ` parameter 
+denotes the wavelength of the light field and the parameter `E` is the pulse energy.
+"""
+struct LightField <: AbstractLight
     intensity::Matrix{<:Real}
-    envelope::Vector{<:Real}
+    norm::Real
     x::Vector{<:Real}
     y::Vector{<:Real}
-    t::Vector{<:Real}
     λ::Real
     E::Real
 end
 
-"""
-    LightField(intensity::Matrix{<:Real}, envelope::Vector{<:Real}, x::Vector{<:Real},
-               y::Vector{<:Real}, t::Vector{<:Real}, λ::Real, E::Real)::LightField2D
-
-Return the 2D Light Field struct.
-
-Create and return a 2D Light Field struct, where the intensity is given by the
-`intensity` parameter, the temporal structure with the `envelope` parameter,
-the coordinates in the `x` and `y` coordinates and the coordinates of the
-temporal structure with the `t` parameter. The `λ` parameter denotes
-the wavelength of the light field and the parameter `E` is the pulse energy.
-"""
-function LightField(intensity::Matrix{<:Real}, envelope::Vector{<:Real}, x::Vector{<:Real},
-                    y::Vector{<:Real}, t::Vector{<:Real}, λ::Real, E::Real)::LightField2d
-    return LightField2d(intensity, envelope, x, y, t, λ, E)
-end
 
 """
     loadintensity(s::String)::Matrix{<:Real}
