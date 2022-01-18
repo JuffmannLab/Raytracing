@@ -1,4 +1,6 @@
 
+using Interpolations: interpolate, BSpline, Quadratic, Reflect, OnCell, gradient
+
 struct PondInteraction <: Component
     lf::AbstractLight
 end
@@ -26,19 +28,19 @@ function calculate!(ray::Electron, pond::PondInteraction)
     p = γ * m_e * ray.v
 
     # calculate the constant
-    constant = - q^2 * lf.E / (1+ray.v / c) / (2 * m_e * γ * ω_L^2 * ε_0 * c) / lf.norm
+    constant = - q^2 * lf.E / (1+ray.v / c) / (2 * m_e * γ * ω^2 * ε_0 * c) / lf.norm
 
     # create the interpolation object
-    itp = interpolate(light_intensity, BSpline(Quadratic(Reflect(OnCell()))))
-    nx = size(x_imprint, 1)
-    ny = size(y_imprint, 1)
+    itp = interpolate(lf.intensity, BSpline(Quadratic(Reflect(OnCell()))))
+    nx = size(lf.x, 1)
+    ny = size(lf.y, 1)
 
     # iterate over the all the electron beams
     for electron in ray.ψ
 
         # calculate the position that should be interpolated
-        xi = (nx - 1) / (x_imprint[end] - x_imprint[1]) * (electron[1] - x_imprint[1]) + 1
-        yi = (ny - 1) / (y_imprint[end] - y_imprint[1]) * (electron[2] - y_imprint[1]) + 1
+        xi = (nx - 1) / (lf.x[end] - lf.x[1]) * (electron[1] - lf.x[1]) + 1
+        yi = (ny - 1) / (lf.y[end] - lf.y[1]) * (electron[2] - lf.y[1]) + 1
 
         # calculate the momentum change
         Δpx, Δpy = constant * Interpolations.gradient(itp, xi, yi)
