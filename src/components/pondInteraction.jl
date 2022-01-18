@@ -43,7 +43,7 @@ function calculate!(ray::Electron, pond::PondInteraction)
         yi = (ny - 1) / (lf.y[end] - lf.y[1]) * (electron[2] - lf.y[1]) + 1
 
         # calculate the momentum change
-        Δpx, Δpy = constant * Interpolations.gradient(itp, xi, yi)
+        Δpx, Δpy = constant * gradient(itp, xi, yi)
 
         # calculate the tangens and a constant
         tan_α = tan(electron[3])
