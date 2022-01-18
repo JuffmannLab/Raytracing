@@ -36,18 +36,18 @@ function calculate!(ray::Electron, pond::PondInteraction)
     ny = size(lf.y, 1)
 
     # iterate over the all the electron beams
-    for electron in ray.ψ
+    for i in eachindex(ray.ψ)
 
         # calculate the position that should be interpolated
-        xi = (nx - 1) / (lf.x[end] - lf.x[1]) * (electron[1] - lf.x[1]) + 1
-        yi = (ny - 1) / (lf.y[end] - lf.y[1]) * (electron[2] - lf.y[1]) + 1
+        xi = (nx - 1) / (lf.x[end] - lf.x[1]) * (ray.ψ[i][1] - lf.x[1]) + 1
+        yi = (ny - 1) / (lf.y[end] - lf.y[1]) * (ray.ψ[i][2] - lf.y[1]) + 1
 
         # calculate the momentum change
         Δpx, Δpy = constant * gradient(itp, xi, yi)
 
         # calculate the tangens and a constant
-        tan_α = tan(electron[3])
-        tan_β = tan(electron[4])
+        tan_α = tan(ray.ψ[i][3])
+        tan_β = tan(ray.ψ[i][4])
         A = sqrt(1 + tan_α^2 + tan_β^2)
 
         # calculate the momentum
@@ -58,9 +58,9 @@ function calculate!(ray::Electron, pond::PondInteraction)
         # calculate the new angle
         # the complex - real transformation is to prevent floating point errors
         # due to floating point differences not being 0 when they should be
-        electron[3] = atan((px + Δpx) / 
+        ray.ψ[i][3] = atan((px + Δpx) / 
                            real(sqrt(complex(pz^2 * A^2 - (px + Δpx)^2 - (py + Δpy)^2))))
-        electron[4] = atan((py + Δpy) / 
+        ray.ψ[i][4] = atan((py + Δpy) / 
                            real(sqrt(complex(pz^2 * A^2 - (px + Δpx)^2 - (py + Δpy)^2))))
 
     end
