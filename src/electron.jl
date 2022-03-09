@@ -100,24 +100,17 @@ function getintensity(ray::Electron, x::Vector{<:Real}, y::Vector{<:Real})::Matr
 end
 
 """
-    mcp(intensity::Matrix{<:Real}, x::Vector{<:Real}, y::Vector{<:Real}, σ::Real)::Matrix{<:Real}
+mcp(intensity::Matrix{<:Real}, psf::Matrix{<:Real})::Matrix{<:Real}
 
 Return the mcp electron distribution.
 
 The light that leaves the mcp is calculated here. It is done by taking the input electron
-istripution of the `intensity` matrix, the geometry of the mcp `x` and `y` and the smearout
-that will happen due to the mcp. The smearout is modelled as a gaussian smear with the width
-of `σ`.
+intensity distribution in the `intensity` matrix and the point spread funciton `psf` of the
+measuring device.
 """
-function mcp(intensity::Matrix{<:Real}, x::Vector{<:Real}, 
-             y::Vector{<:Real}, σ::Real)::Matrix{<:Real}
-
-    # create the smear function that is applied to the intensity
-    smear = [exp(-(x[i]^2+y[j]^2) / 2 / σ^2) for i in eachindex(x), j in eachindex(y)]
-
-    # convolve the smear function with the intensity
+function mcp(intensity::Matrix{<:Real}, psf::Matrix{<:Real})::Matrix{<:Real}
     INTENSITY = fft(intensity)
-    SMEAR = fft(smear)
-    SMEAR .*= INTENSITY
-    return real.(ifftshift(ifft(SMEAR)))
+    PSF = fft(psf)
+    PSF .*= INTENSITY
+    return real.(ifftshift(ifft(PSF)))
 end

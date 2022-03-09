@@ -1,4 +1,6 @@
 
+using Interpolations
+
 struct PondInteraction <: Component
     lf::AbstractLight
 end
