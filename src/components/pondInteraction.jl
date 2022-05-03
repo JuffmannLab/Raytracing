@@ -53,9 +53,6 @@ function calculate!(ray::Electron, pond::PondInteraction)
                            real(sqrt(complex(pz^2 * A^2 - (px + Δpx)^2 - (py + Δpy)^2))))
         ray.ψ[i][4] = atan((py + Δpy) / 
                            real(sqrt(complex(pz^2 * A^2 - (px + Δpx)^2 - (py + Δpy)^2))))
-
-        ray.ψ[i][3] = (px + Δpx) / pz
-        ray.ψ[i][4] = (py + Δpy) / pz
     end
 end
 
