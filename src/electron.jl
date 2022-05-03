@@ -44,20 +44,14 @@ function Electron(x::Vector{<:Real}, y::Vector{<:Real}, intensity::Matrix{<:Real
 
     # iterate over the ψ array, fill it with random coordinates
     for i = 1:n
-
         # generate random coordinates that are evenly distributed in x and y direction
         coords_rand = rand(Float64, 2) .- 0.5
         x_temp = coords_rand[1] * span_x
         y_temp = coords_rand[2] * span_y
 
-        # get the position of the random coordinates in the intensity array
-        m_x = round(Int, (x_temp-x[1]) / Δx, RoundDown) + 1
-        m_y = round(Int, (y_temp-y[1]) / Δy, RoundDown) + 1
-
         # fill the ψ, p_ges and flat_int vectors
         ψ[i] = [x_temp, y_temp, 0., 0.]
-        int_flat[i] = intensity[m_x, m_y]
-
+        int_flat[i] = _interpolation(intensity, x, y, x_temp, y_temp)
     end
 
     # the wanted struct
@@ -100,7 +94,7 @@ function getintensity(ray::Electron, x::Vector{<:Real}, y::Vector{<:Real})::Matr
 end
 
 """
-mcp(intensity::Matrix{<:Real}, psf::Matrix{<:Real})::Matrix{<:Real}
+    mcp(intensity::Matrix{<:Real}, psf::Matrix{<:Real})::Matrix{<:Real}
 
 Return the mcp electron distribution.
 

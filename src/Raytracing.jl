@@ -12,6 +12,7 @@ global const c = 299792458           # the speed of light
 global const ε_0 = 8.8541878128e-12  # vacuum permitivity
 
 # include all the code that is used
+include("./helperFunctions.jl")
 include("./electron.jl")
 include("./lightField.jl")
 include("./components.jl")
