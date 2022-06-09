@@ -2,8 +2,6 @@
 # import the image toolbox
 using Images
 
-abstract type AbstractLight end
-
 """
     LightField(intensity::Matrix{<:Real}, norm::Real, x::Vector{<:Real},
                y::Vector{<:Real}, λ::Real, E::Real)::LightField
@@ -15,7 +13,7 @@ Create and return a Light Field struct, where the intensity is given by the
 `norm` of the intensity, the coordinates in the `x` and `y` direction The `λ` parameter 
 denotes the wavelength of the light field and the parameter `E` is the pulse energy.
 """
-struct LightField <: AbstractLight
+struct LightField
     intensity::Matrix{<:Real}
     norm::Real
     x::Vector{<:Real}

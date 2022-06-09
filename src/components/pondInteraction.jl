@@ -1,6 +1,6 @@
 
 struct PondInteraction <: Component
-    lf::AbstractLight
+    lf::LightField
 end
 
 """

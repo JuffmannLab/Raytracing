@@ -1,10 +1,7 @@
 
 using FFTW
 
-abstract type AbstractElectron end
-
-
-mutable struct Electron <: AbstractElectron
+mutable struct Electron
     ψ::Vector{Array}
     intensity::Vector{<:Real}
     v::Real
